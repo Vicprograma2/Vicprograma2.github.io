@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocLogix — Extractor Documental Logístico</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --accent:#00E5A0;--accent2:#0099FF;--bg:#0A0D13;
+    --surface:#111620;--surface2:#1A2030;--border:#232D40;
+    --text:#E8EDF5;--muted:#5A6680;
+  }
+  body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;}
+  header{border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);}
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .logo-name{font-size:14px;font-weight:700;letter-spacing:.15em;}
+  .logo-sub{font-size:10px;color:var(--muted);letter-spacing:.2em;}
+  .badge{font-size:10px;letter-spacing:.15em;color:var(--accent);border:1px solid rgba(0,229,160,.2);border-radius:4px;padding:4px 10px;background:rgba(0,229,160,.07);}
+  main{max-width:960px;margin:0 auto;padding:40px 24px;}
+  h1{font-family:'IBM Plex Sans',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;}
+  .subtitle{font-size:13px;color:var(--muted);margin-bottom:36px;line-height:1.6;}
+  .notices{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .notice{flex:1;min-width:220px;border-radius:8px;padding:12px 16px;font-size:11px;line-height:1.7;display:flex;gap:10px;align-items:flex-start;}
+  .notice-green{background:#0A1A0F;border:1px solid rgba(0,229,160,.2);color:#7EEEBB;}
+  .notice-blue{background:#0A0F1A;border:1px solid rgba(0,153,255,.2);color:#7EBBEE;}
+  .notice strong{display:block;margin-bottom:2px;}
+  .notice-green strong{color:var(--accent);}
+  .notice-blue strong{color:var(--accent2);}
+  .alert{background:rgba(0,153,255,.07);border:1px solid rgba(0,153,255,.2);border-radius:8px;padding:13px 18px;font-size:12px;color:rgba(0,153,255,.9);line-height:1.6;margin-bottom:20px;}
+  .trial-banner{background:linear-gradient(135deg,rgba(0,229,160,.07),rgba(0,153,255,.07));border:1px solid rgba(0,229,160,.25);border-radius:8px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .trial-text{font-size:12px;line-height:1.5;}
+  .trial-text span{color:var(--muted);}
+  .trial-count{font-size:24px;font-weight:700;color:var(--accent);font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;margin-bottom:20px;}
+  .card-title{font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .step{width:20px;height:20px;border-radius:50%;background:rgba(0,229,160,.13);border:1px solid rgba(0,229,160,.4);color:var(--accent);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .dropzone{border:2px dashed var(--border);border-radius:8px;padding:40px 24px;text-align:center;cursor:pointer;background:var(--surface2);transition:all .2s;}
+  .dropzone:hover,.dropzone.active{border-color:var(--accent);background:rgba(0,229,160,.04);}
+  .drop-icon{font-size:32px;margin-bottom:12px;opacity:.7;}
+  .drop-text{font-size:13px;color:var(--muted);line-height:1.6;}
+  .drop-text strong{color:var(--text);}
+  .file-list{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;}
+  .file-chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;}
+  .file-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:0;}
+  .file-count{font-size:11px;color:var(--muted);margin-top:8px;}
+  .suggestions{margin-bottom:14px;}
+  .suggestions p{font-size:11px;color:var(--muted);margin-bottom:8px;}
+  .suggest-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .suggest-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+  .suggest-btn:hover,.suggest-btn.active{background:rgba(0,229,160,.13);border-color:rgba(0,229,160,.4);color:var(--accent);}
+  .input-row{display:flex;gap:8px;margin-top:12px;}
+  input[type=text]{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none;}
+  input[type=text]:focus{border-color:rgba(0,229,160,.5);}
+  input[type=file]{display:none;}
+  .btn-add{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:6px;padding:10px 20px;color:#000;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;white-space:nowrap;}
+  .fields-selected{margin-top:14px;}
+  .fields-selected p{font-size:11px;color:var(--muted);margin-bottom:8px;}
+  .field-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .field-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,153,255,.1);border:1px solid rgba(0,153,255,.3);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--accent2);}
+  .field-chip button{background:none;border:none;color:rgba(0,153,255,.5);cursor:pointer;font-size:14px;padding:0;line-height:1;}
+  .progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;width:0%;}
+  .status-text{font-size:11px;color:var(--muted);letter-spacing:.1em;}
+  .btn-run{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;padding:16px;color:#000;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;margin-top:8px;transition:opacity .2s;}
+  .btn-run:disabled{opacity:.3;cursor:not-allowed;}
+  .hint{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;}
+  .results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .results-title{font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);}
+  .btn-download{background:transparent;border:1px solid var(--accent);border-radius:6px;padding:8px 18px;color:var(--accent);font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.15em;cursor:pointer;text-transform:uppercase;}
+  .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th{background:var(--surface2);border:1px solid var(--border);padding:10px 14px;text-align:left;color:var(--accent);font-size:10px;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;}
+  td{border:1px solid var(--border);padding:10px 14px;vertical-align:top;line-height:1.5;}
+  td.fname{color:var(--muted);font-size:11px;white-space:nowrap;}
+  td.null-val{color:var(--muted);}
+  tr:nth-child(even){background:rgba(26,32,48,.5);}
+  .blocked{background:var(--surface);border:1px solid rgba(255,68,68,.2);border-radius:10px;padding:48px 32px;text-align:center;margin-bottom:20px;}
+  .blocked-icon{font-size:44px;margin-bottom:16px;}
+  .blocked-title{font-family:'IBM Plex Sans',sans-serif;font-size:20px;font-weight:700;margin-bottom:10px;}
+  .blocked-sub{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:28px;}
+  .btn-contact{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;padding:14px 36px;color:#000;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;text-decoration:none;}
+  .contact-info{margin-top:16px;font-size:11px;color:var(--muted);}
+  .error-box{background:rgba(255,68,68,.07);border:1px solid rgba(255,68,68,.2);border-radius:8px;padding:12px 16px;font-size:12px;color:#FF8888;margin-bottom:14px;}
+  #loading-section{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📦</div>
+    <div>
+      <div class="logo-name">DOCLOGIX</div>
+      <div class="logo-sub">Extractor Documental · Beta</div>
+    </div>
+  </div>
+  <div class="badge">DEMO v0.1</div>
+</header>
+
+<main>
+  <h1>Extracción inteligente de datos logísticos</h1>
+  <p class="subtitle">Sube tus documentos PDF (facturas, guías, DUA, BL), define los campos que necesitas<br>y descarga una planilla lista para tu equipo contable o de operaciones.</p>
+
+  <div class="notices">
+    <div class="notice notice-green">
+      <span style="font-size:16px;flex-shrink:0">🔒</span>
+      <span><strong>Privacidad garantizada.</strong>Tus documentos no se almacenan ni se guardan en ningún servidor. El procesamiento ocurre en tiempo real y los archivos se descartan inmediatamente. Almacenamiento disponible solo si el cliente lo solicita expresamente.</span>
+    </div>
+    <div class="notice notice-blue">
+      <span style="font-size:16px;flex-shrink:0">🎨</span>
+      <span><strong>Versión corporativa a medida.</strong>Colores, logo y parámetros visuales adaptados a tu empresa. Solicita tu versión personalizada y te enviamos una propuesta.</span>
+    </div>
+  </div>
+
+  <div class="alert">⚡ <strong>Requisito clave:</strong> todos los documentos deben tener el mismo formato y layout. La extracción es más precisa cuando la estructura del documento es consistente entre archivos.</div>
+
+  <div class="trial-banner" id="trial-banner">
+    <div class="trial-text">
+      <strong>Demo gratuita</strong> · <span id="remaining-text">3 extracciones disponibles.</span><br>
+      <span>Acceso completo disponible con licencia comercial.</span>
+    </div>
+    <div class="trial-count" id="trial-count">3/3</div>
+  </div>
+
+  <div id="main-content">
+
+    <!-- STEP 1 -->
+    <div class="card">
+      <div class="card-title"><div class="step">1</div>Cargar documentos PDF</div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="drop-icon">📄</div>
+        <div class="drop-text"><strong>Arrastra tus PDFs aquí</strong> o haz clic para seleccionar<br><span style="font-size:11px">Acepta múltiples archivos · Solo formato PDF</span></div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf" multiple onchange="handleFiles(this.files)"/>
+      <div class="file-list" id="fileList"></div>
+      <div class="file-count" id="fileCount"></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="card">
+      <div class="card-title"><div class="step">2</div>Definir campos a extraer</div>
+      <div class="suggestions">
+        <p>Campos frecuentes — clic para agregar:</p>
+        <div class="suggest-list" id="suggestList"></div>
+      </div>
+      <div class="input-row">
+        <input type="text" id="fieldInput" placeholder="Agregar campo personalizado... ej: Peso neto (kg)" onkeydown="if(event.key==='Enter')addField()"/>
+        <button class="btn-add" onclick="addField()">+ Agregar</button>
+      </div>
+      <div class="fields-selected" id="fieldsSelected" style="display:none">
+        <p id="fieldsCount"></p>
+        <div class="field-chips" id="fieldChips"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="card">
+      <div class="card-title"><div class="step">3</div>Ejecutar extracción</div>
+      <div id="loading-section">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="status-text" id="statusText"></div>
+      </div>
+      <div class="error-box" id="errorBox" style="display:none"></div>
+      <button class="btn-run" id="btnRun" onclick="runExtraction()" disabled>
+        Extraer datos →
+      </button>
+      <div class="hint" id="hint">Carga al menos 1 PDF y define 1 campo para continuar</div>
+    </div>
+
+  </div>
+
+  <!-- BLOCKED -->
+  <div class="blocked" id="blocked" style="display:none">
+    <div class="blocked-icon">🔒</div>
+    <div class="blocked-title">Demo completada</div>
+    <div class="blocked-sub">Has utilizado las 3 extracciones gratuitas de esta demo.<br>Contáctanos para activar tu acceso completo y procesar<br>documentos sin límite con soporte dedicado.</div>
+    <a href="https://wa.me/56999340721?text=Hola%2C%20quiero%20activar%20DocLogix%20para%20mi%20empresa" target="_blank" class="btn-contact">Activar acceso completo →</a>
+    <div class="contact-info">+56 9 9934 0721 · lmovexa@gmail.com</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="card" id="resultsCard" style="display:none">
+    <div class="results-header">
+      <div class="results-title"><span class="dot"></span>Resultados</div>
+      <button class="btn-download" onclick="downloadCSV()">↓ Descargar CSV</button>
+    </div>
+    <div class="table-wrap"><table id="resultsTable"></table></div>
+  </div>
+
+</main>
+
+<script>
+const TRIAL_LIMIT = 3;
+const STORAGE_KEY = 'doclogix-used';
+const SUGGESTIONS = ['Número de factura','Fecha','Proveedor','RUT / Tax ID','Total','Moneda','País origen','Descripción ítem','Cantidad','Precio unitario','Incoterm','Puerto destino'];
+
+let files = [];
+let fields = [];
+let results = [];
+let usedCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
+
+function init() {
+  renderSuggestions();
+  updateTrialUI();
+  if (usedCount >= TRIAL_LIMIT) showBlocked();
+  setupDrop();
+}
+
+function updateTrialUI() {
+  const remaining = TRIAL_LIMIT - usedCount;
+  document.getElementById('remaining-text').textContent = remaining + ' extracción' + (remaining !== 1 ? 'es' : '') + ' disponible' + (remaining !== 1 ? 's' : '') + '.';
+  document.getElementById('trial-count').textContent = remaining + '/' + TRIAL_LIMIT;
+}
+
+function showBlocked() {
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('trial-banner').style.display = 'none';
+  document.getElementById('blocked').style.display = 'block';
+}
+
+function renderSuggestions() {
+  const c = document.getElementById('suggestList');
+  c.innerHTML = '';
+  SUGGESTIONS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'suggest-btn' + (fields.includes(s) ? ' active' : '');
+    b.textContent = s;
+    b.onclick = () => { if (!fields.includes(s)) { fields.push(s); } else { fields = fields.filter(f => f !== s); } renderSuggestions(); renderFields(); updateBtn(); };
+    c.appendChild(b);
+  });
+}
+
+function addField() {
+  const v = document.getElementById('fieldInput').value.trim();
+  if (v && !fields.includes(v)) { fields.push(v); document.getElementById('fieldInput').value = ''; renderFields(); renderSuggestions(); updateBtn(); }
+}
+
+function removeField(f) { fields = fields.filter(x => x !== f); renderFields(); renderSuggestions(); updateBtn(); }
+
+function renderFields() {
+  const s = document.getElementById('fieldsSelected');
+  const c = document.getElementById('fieldChips');
+  if (!fields.length) { s.style.display = 'none'; return; }
+  s.style.display = 'block';
+  document.getElementById('fieldsCount').textContent = 'Campos seleccionados (' + fields.length + '):';
+  c.innerHTML = '';
+  fields.forEach(f => {
+    const chip = document.createElement('span');
+    chip.className = 'field-chip';
+    chip.innerHTML = f + '<button onclick="removeField(\'' + f.replace(/'/g,"\\'") + '\')">×</button>';
+    c.appendChild(chip);
+  });
+}
+
+function handleFiles(newFiles) {
+  Array.from(newFiles).filter(f => f.type === 'application/pdf').forEach(f => files.push(f));
+  renderFiles(); updateBtn();
+}
+
+function removeFile(i) { files.splice(i, 1); renderFiles(); updateBtn(); }
+
+function renderFiles() {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  files.forEach((f, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'file-chip';
+    chip.innerHTML = '📄 ' + f.name + '<button onclick="removeFile(' + i + ')">×</button>';
+    list.appendChild(chip);
+  });
+  const count = document.getElementById('fileCount');
+  count.textContent = files.length ? files.length + ' archivo' + (files.length !== 1 ? 's' : '') + ' cargado' + (files.length !== 1 ? 's' : '') : '';
+}
+
+function updateBtn() {
+  const btn = document.getElementById('btnRun');
+  const hint = document.getElementById('hint');
+  const canRun = files.length > 0 && fields.length > 0 && usedCount < TRIAL_LIMIT;
+  btn.disabled = !canRun;
+  btn.textContent = 'Extraer datos de ' + files.length + ' documento' + (files.length !== 1 ? 's' : '') + ' →';
+  if (!files.length && !fields.length) hint.textContent = 'Carga al menos 1 PDF y define 1 campo para continuar';
+  else if (!files.length) hint.textContent = 'Carga al menos 1 PDF para continuar';
+  else if (!fields.length) hint.textContent = 'Define al menos 1 campo para extraer';
+  else hint.textContent = '';
+}
+
+function setProgress(p, msg) {
+  document.getElementById('progressFill').style.width = p + '%';
+  document.getElementById('statusText').textContent = msg;
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Error leyendo archivo'));
+    r.readAsDataURL(file);
+  });
+}
+
+async function runExtraction() {
+  if (usedCount >= TRIAL_LIMIT) return;
+  document.getElementById('btnRun').disabled = true;
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('loading-section').style.display = 'block';
+  document.getElementById('resultsCard').style.display = 'none';
+  results = [];
+  setProgress(5, 'Iniciando...');
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    setProgress(Math.round(10 + (i / files.length) * 78), 'Procesando ' + (i+1) + ' de ' + files.length + ': ' + file.name);
+    try {
+      const b64 = await toBase64(file);
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: 'Eres un extractor preciso de datos de documentos logísticos. RESPONDE ÚNICAMENTE con un objeto JSON válido con exactamente los campos solicitados. Si un campo no existe usa null. Sin texto adicional ni markdown.',
+          messages: [{role:'user',content:[
+            {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+            {type:'text',text:'Extrae exactamente estos campos: ' + JSON.stringify(fields) + '\n\nResponde solo con el JSON.'}
+          ]}]
+        })
+      });
+      const data = await resp.json();
+      const raw = data.content?.find(c => c.type === 'text')?.text || '{}';
+      const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+      results.push({fileName: file.name, ...parsed});
+    } catch(e) {
+      results.push({fileName: file.name, error: 'Error: ' + e.message});
+    }
+  }
+
+  setProgress(100, 'Extracción completada ✓');
+  usedCount++;
+  localStorage.setItem(STORAGE_KEY, String(usedCount));
+  updateTrialUI();
+  if (usedCount >= TRIAL_LIMIT) setTimeout(showBlocked, 2000);
+
+  renderResults();
+  document.getElementById('resultsCard').style.display = 'block';
+  document.getElementById('btnRun').disabled = false;
+}
+
+function renderResults() {
+  const t = document.getElementById('resultsTable');
+  const headers = ['Archivo', ...fields];
+  let html = '<thead><tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>';
+  results.forEach(row => {
+    html += '<tr><td class="fname">' + row.fileName + '</td>';
+    fields.forEach(f => {
+      const v = row[f];
+      html += v != null ? '<td>' + String(v) + '</td>' : '<td class="null-val">—</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+function downloadCSV() {
+  if (!results.length) return;
+  const headers = ['Archivo', ...fields];
+  const rows = results.map(row =>
+    [row.fileName, ...fields.map(f => {
+      const v = row[f]; if (v == null) return '';
+      const s = String(v);
+      return (s.includes(',') || s.includes('"')) ? '"' + s.replace(/"/g,'""') + '"' : s;
+    })].join(',')
+  );
+  const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+  const a = Object.assign(document.createElement('a'), {href: URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})), download: 'extraccion_logistica_' + Date.now() + '.csv'});
+  a.click();
+}
+
+function setupDrop() {
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('active'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('active'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('active'); handleFiles(e.dataTransfer.files); });
+}
+
+init();
+</script>
+</body>
+</html>
