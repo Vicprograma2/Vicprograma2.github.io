@@ -427,6 +427,49 @@ section{
 }
 .contact-link:hover{transform:translateY(-2px);}
 
+/* LIGHTBOX */
+.lightbox{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.lightbox.active{display:flex;}
+.lightbox img{
+  max-width:95vw;
+  max-height:90vh;
+  border-radius:10px;
+  border:1px solid var(--border);
+  box-shadow:0 0 60px rgba(0,212,170,.15);
+}
+.lightbox-close{
+  position:fixed;
+  top:20px;right:24px;
+  font-size:32px;
+  color:var(--muted);
+  cursor:pointer;
+  background:none;
+  border:none;
+  line-height:1;
+  transition:color .2s;
+}
+.lightbox-close:hover{color:var(--text);}
+.lightbox-caption{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:13px;
+  color:var(--muted);
+  font-family:'Syne',sans-serif;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+
 /* FOOTER */
 footer{
   text-align:center;
@@ -596,6 +639,13 @@ footer{
 
 <div class="divider"></div>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="Dashboard"/>
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
 <!-- DASHBOARDS -->
 <section id="dashboards">
   <div class="section-tag">Power BI</div>
@@ -603,7 +653,9 @@ footer{
   <div class="gallery-grid">
 
     <div class="gallery-card">
-      <div class="gallery-img">📦</div>
+      <div class="gallery-img" style="cursor:pointer;" onclick="openLightbox('dashboard-despachos.png','Dashboard Operacional de Despachos — The North Face · Komax Chile')">
+        <img src="dashboard-despachos.png" alt="Dashboard Operacional de Despachos"/>
+      </div>
       <div class="gallery-info">
         <div class="gallery-title">Dashboard Operacional de Despachos</div>
         <div class="gallery-sub">Seguimiento en tiempo real de órdenes, Fill Rate y estado de despachos por ruta. Operación The North Face — Komax Chile.</div>
@@ -613,6 +665,8 @@ footer{
           <span class="kpi-chip">Estado Órdenes</span>
           <span class="kpi-chip">FR por Ruta</span>
         </div>
+        <br/>
+        <a href="#" class="project-link" onclick="openLightbox('dashboard-despachos.png','Dashboard Operacional de Despachos');return false;">Ver dashboard →</a>
       </div>
     </div>
 
@@ -627,6 +681,8 @@ footer{
           <span class="kpi-chip">Cobertura</span>
           <span class="kpi-chip">Valor Inv.</span>
         </div>
+        <br/>
+        <span style="font-size:11px;color:var(--muted);letter-spacing:.1em;">🔧 EN DESARROLLO</span>
       </div>
     </div>
 
@@ -641,6 +697,8 @@ footer{
           <span class="kpi-chip">Costo/Pedido</span>
           <span class="kpi-chip">Reclamos</span>
         </div>
+        <br/>
+        <span style="font-size:11px;color:var(--muted);letter-spacing:.1em;">🔧 EN DESARROLLO</span>
       </div>
     </div>
 
@@ -665,19 +723,31 @@ footer{
       <a href="https://wa.me/56941922270?text=Hola%20Víctor%2C%20vi%20tu%20portafolio%20y%20me%20interesa%20conversar" class="contact-link wa" target="_blank">
         💬 WhatsApp
       </a>
-      <a href="mailto:victorfecortez@gmail.com" class="contact-link mail">
+      <a href="/cdn-cgi/l/email-protection#4f39262c3b203d292a2c203d3b2a350f28222e2623612c2022" class="contact-link mail">
         ✉️ Email
       </a>
     </div>
     <p style="margin-top:24px;font-size:12px;color:var(--muted);">
-      Santiago, Chile · victorfecortez@gmail.com · +56 9 4192 2270
+      Santiago, Chile · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="01776862756e736764626e7375647b41666c60686d2f626e6c">[email&#160;protected]</a> · +56 9 4192 2270
     </p>
-  </div>
-</section>
+  </section>
 
 <footer>
   © 2026 Víctor Felipe Cortez Carrasco · Senior Logistics Specialist · Santiago, Chile
 </footer>
 
+<script>
+function openLightbox(img, caption){
+  document.getElementById('lightbox-img').src = img;
+  document.getElementById('lightbox-caption').textContent = caption;
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+</script>
 </body>
 </html>
